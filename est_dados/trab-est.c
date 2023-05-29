@@ -3,62 +3,63 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct Node {
-  char word[50];
-  int count;
-  struct Node *next;
-  struct Node *prev;
-} Node;
-
 #define HASH_SIZE 26
 
-void insertWord(Node **hashList, const char *word) {
-  int index = word[0] - 'a';
+typedef struct Node {
+  char palavra[50];
+  int quantidade;
+  struct Node *prox;
+  struct Node *ant;
+} Node;
 
-  Node *current = hashList[index];
-  while (current != NULL) {
-    if (strcmp(current->word, word) == 0) {
-      current->count++;
+int hashear(const char *palavra) { return palavra[0] - 'a'; }
+
+void inserePalavra(Node **hashList, const char *palavra) {
+  int hash = hashear(palavra);
+
+  Node *aux = hashList[hash];
+  while (aux != NULL) {
+    if (strcmp(aux->palavra, palavra) == 0) {
+      aux->quantidade++;
       return;
     }
-    current = current->next;
+    aux = aux->prox;
   }
 
-  Node *newNode = (Node *)malloc(sizeof(Node));
-  strcpy(newNode->word, word);
-  newNode->count = 1;
-  newNode->next = NULL;
+  Node *novo = (Node *)malloc(sizeof(Node));
+  strcpy(novo->palavra, palavra);
+  novo->quantidade = 1;
+  novo->prox = NULL;
 
-  if (hashList[index] == NULL) {
-    hashList[index] = newNode;
+  if (hashList[hash] == NULL) {
+    hashList[hash] = novo;
   } else {
-    current = hashList[index];
-    while (current->next != NULL) {
-      current = current->next;
+    aux = hashList[hash];
+    while (aux->prox != NULL) {
+      aux = aux->prox;
     }
-    current->next = newNode;
+    aux->prox = novo;
   }
 }
 
-void printHashList(Node **hashList, int sortOption) {
-  // sortOption: 1 - A-Z, 2 - Z-A
-  Node *current;
-  Node *filteredList = NULL;
+void printarHashList(Node **hashList, int tipoOrdenacao) {
+  Node *aux;
+  Node *listaFiltrada = NULL;
 
-  if (sortOption == 1) {
+  if (tipoOrdenacao == 1) {
     for (int i = 0; i < HASH_SIZE; i++) {
-      Node *current = hashList[i];
-      while (current != NULL) {
-        printf("%s: %d\n", current->word, current->count);
-        current = current->next;
+      Node *aux = hashList[i];
+      while (aux != NULL) {
+        printf("%s: %d\n", aux->palavra, aux->quantidade);
+        aux = aux->prox;
       }
     }
-  } else if (sortOption == 2) {
+  } else if (tipoOrdenacao == 2) {
     for (int i = HASH_SIZE - 1; i >= 0; i--) {
-      Node *current = hashList[i];
-      while (current != NULL) {
-        printf("%s: %d\n", current->word, current->count);
-        current = current->next;
+      aux = hashList[i];
+      while (aux != NULL) {
+        printf("%s: %d\n", aux->palavra, aux->quantidade);
+        aux = aux->prox;
       }
     }
   } else {
@@ -67,167 +68,242 @@ void printHashList(Node **hashList, int sortOption) {
   }
 }
 
-void freeHashList(Node **hashList) {
+void limparHashList(Node **hashList) {
   for (int i = 0; i < HASH_SIZE; i++) {
-    Node *current = hashList[i];
-    while (current != NULL) {
-      Node *next = current->next;
-      free(current);
-      current = next;
+    Node *aux = hashList[i];
+    while (aux != NULL) {
+      Node *next = aux->prox;
+      free(aux);
+      aux = next;
     }
   }
 }
 
-void removeWord(Node **hashList, const char *word) {
-  int index = word[0] - 'a';
+void removePalavra(Node **hashList, const char *palavra) {
+  int hash = hashear(palavra);
 
-  Node *current = hashList[index];
-  while (current != NULL) {
-    if (strcmp(current->word, word) == 0) {
-      if (current->prev != NULL) {
-        current->prev->next = current->next;
+  Node *aux = hashList[hash];
+  while (aux != NULL) {
+    if (strcmp(aux->palavra, palavra) == 0) {
+      if (aux->ant != NULL) {
+        aux->ant->prox = aux->prox;
       } else {
-        hashList[index] = current->next;
+        hashList[hash] = aux->prox;
       }
-      if (current->next != NULL) {
-        current->next->prev = current->prev;
+      if (aux->prox != NULL) {
+        aux->prox->ant = aux->ant;
       }
-      free(current);
-      printf("A palavra '%s' foi removida da lista.\n", word);
+      free(aux);
+      printf("A palavra '%s' foi removida da lista.\n", palavra);
       return;
     }
-    current = current->next;
+    aux = aux->prox;
   }
-  printf("A palavra '%s' não foi encontrada na lista.\n", word);
+  printf("A palavra '%s' não foi encontrada na lista.\n", palavra);
 }
 
-// pesquisa pela primeira letra
-void searchWordsByLetter(Node **head, char letter, int sortOption) {
-  int index = letter - 'a';
-  Node *current = head[index];
-  Node *filteredList[HASH_SIZE];
-  memset(filteredList, 0, sizeof(filteredList));
+void buscarPorLetra(Node **head, char letter, int sortOption) {
+  int hash = hashear(&letter);
+  Node *aux = head[hash];
+  Node *listaFiltrada[HASH_SIZE];
+  memset(listaFiltrada, 0, sizeof(listaFiltrada));
 
-  while (current != NULL) {
-    if (current->word[0] == letter) {
-      insertWord(filteredList, current->word);
+  while (aux != NULL) {
+    if (aux->palavra[0] == letter) {
+      inserePalavra(listaFiltrada, aux->palavra);
     }
-    current = current->next;
+    aux = aux->prox;
   }
 
   printf("\nPalavras que iniciam com '%c':\n", letter);
-  printHashList(filteredList, sortOption);
+  printarHashList(listaFiltrada, sortOption);
 
-  freeHashList(filteredList);
+  limparHashList(listaFiltrada);
 }
 
-void searchWordsByCount(Node **hashList, int count) {
-  Node *filteredList[HASH_SIZE];
-  memset(filteredList, 0, sizeof(filteredList));
+void buscarPorOcorrencias(Node **hashList, int numeroOcorrencias) {
+  Node *listaFiltrada[HASH_SIZE];
+  memset(listaFiltrada, 0, sizeof(listaFiltrada));
 
   for (int i = 0; i < HASH_SIZE; i++) {
-    Node *current = hashList[i];
-    while (current != NULL) {
-      if (current->count == count) {
-        insertWord(filteredList, current->word);
+    Node *aux = hashList[i];
+    while (aux != NULL) {
+      if (aux->quantidade == numeroOcorrencias) {
+        inserePalavra(listaFiltrada, aux->palavra);
       }
-      current = current->next;
+      aux = aux->prox;
     }
   }
 
-  printf("\nPalavras com %d ocorrência(s):\n", count);
-  printHashList(filteredList, 1);
+  printf("\nPalavras com %d ocorrência(s):\n", numeroOcorrencias);
+  printarHashList(listaFiltrada, 1);
 
-  freeHashList(filteredList);
+  limparHashList(listaFiltrada);
 }
 
-int hashFunction(const char *word) { return word[0] - 'a'; }
-
-void insertWordByCount(Node **head, const char *word, int count) {
-  Node *newNode = (Node *)malloc(sizeof(Node));
-  int index = hashFunction(word);
-  Node *current = head[index];
-
-  strcpy(newNode->word, word);
-  newNode->count = count;
-  newNode->next = NULL;
-  newNode->prev = NULL;
-
-  if (head[index] == NULL) {
-    head[index] = newNode;
-  } else {
-    current = head[index];
-    while (current->next != NULL) {
-      current = current->next;
-    }
-    current->next = newNode;
-    newNode->prev = current;
-  }
-}
-
-// Helper function to swap two nodes
-void swapNodes(Node **a, Node **b) {
+void trocar(Node **a, Node **b) {
   Node *temp = *a;
   *a = *b;
   *b = temp;
 }
 
-// Helper function to sort the filtered list by count using bubble sort
-void sortByCount(Node **filteredList) {
-  int swapped;
-  Node *ptr1 = NULL;
-  Node *lptr = NULL;
-
-  if (*filteredList == NULL)
-    return;
-
-  do {
-    swapped = 0;
-    Node *current = *filteredList;
-
-    while (current->next != lptr) {
-      if (current->count < current->next->count) {
-        swapNodes(&current, &(current->next));
-        swapped = 1;
-      }
-      current = current->next;
-    }
-    lptr = current;
-  } while (swapped);
+void limparConsole() {
+#ifdef _WIN32
+  system("cls");
+#else
+  system("clear");
+#endif
 }
 
-// print the hashed list ordered by number of occurrences
-void printOrderedByCount(Node **hashList) {
-  Node *current;
-  Node *filteredList = NULL;
+
+void insereOrdenado(Node **head, Node *novo) {
+  if (*head == NULL) {
+    *head = novo;
+    return;
+  }
+
+  Node *aux = *head;
+  Node *ant = NULL;
+
+  while (aux != NULL && aux->quantidade > novo->quantidade) {
+    ant = aux;
+    aux = aux->prox;
+  }
+
+  if (ant == NULL) {
+    novo->prox = *head;
+    *head = novo;
+  } else {
+    ant->prox = novo;
+    novo->prox = aux;
+  }
+
+  return;
+}
+
+void ordenarPorQuantidade(Node **listaFiltrada) {
+  int trocou;
+  Node *ptr1 = NULL;
+  Node *lptr = NULL;
+  
+  Node *aux = NULL;
 
   for (int i = 0; i < HASH_SIZE; i++) {
-    current = hashList[i];
-    while (current != NULL) {
-      insertWord(&filteredList, current->word);
-      current = current->next;
+    aux = listaFiltrada[i];
+    while (aux != NULL) {
+      Node *novo = (Node *)malloc(sizeof(Node));
+      strcpy(novo->palavra, aux->palavra);
+      novo->quantidade = aux->quantidade;
+      novo->prox = NULL;
+      insereOrdenado(&ptr1, novo);
+      aux = aux->prox;
     }
   }
 
-  sortByCount(&filteredList);
+  *listaFiltrada = ptr1;
+}
+
+void inserePalavraComQuantidade(Node **hashList, const char *palavra,
+                                int quantidade) {
+  int hash = hashear(palavra);
+
+  Node *aux = hashList[hash];
+  while (aux != NULL) {
+    if (strcmp(aux->palavra, palavra) == 0) {
+      aux->quantidade += quantidade;
+      return;
+    }
+    aux = aux->prox;
+  }
+
+  Node *novo = (Node *)malloc(sizeof(Node));
+  strcpy(novo->palavra, palavra);
+  novo->quantidade = quantidade;
+  novo->prox = NULL;
+
+  if (hashList[hash] == NULL) {
+    hashList[hash] = novo;
+  } else {
+    aux = hashList[hash];
+    while (aux->prox != NULL) {
+      aux = aux->prox;
+    }
+    aux->prox = novo;
+  }
+}
+
+void printarLista(Node *head) {
+  Node *aux = head;
+  while (aux != NULL) {
+    printf("%s: %d\n", aux->palavra, aux->quantidade);
+    aux = aux->prox;
+  }
+}
+
+void printarOrdenadoPorQuantidade(Node **hashList) {
+  Node *aux;
+  Node *listaFiltrada[HASH_SIZE];
+  memset(listaFiltrada, 0, sizeof(listaFiltrada));
+
+  for (int i = 0; i < HASH_SIZE; i++) {
+    aux = hashList[i];
+    while (aux != NULL) {
+      inserePalavraComQuantidade(listaFiltrada, aux->palavra, aux->quantidade);
+      aux = aux->prox;
+    }
+  }
+
+  free(aux);
+
+  aux = NULL;
+
+  ordenarPorQuantidade(&aux);
 
   printf(
       "\nPalavras e suas contagens (ordenadas por número de ocorrências):\n");
-  printHashList(&filteredList, 1);
+  printarLista(aux);
 
-  freeHashList(&filteredList);
+  free(aux);
+
+  limparHashList(listaFiltrada);
 }
 
-int countHashList(Node **hashList) {
+int contarHashList(Node **hashList) {
   int count = 0;
   for (int i = 0; i < HASH_SIZE; i++) {
-    Node *current = hashList[i];
-    while (current != NULL) {
+    Node *aux = hashList[i];
+    while (aux != NULL) {
       count++;
-      current = current->next;
+      aux = aux->prox;
     }
   }
   return count;
+}
+
+int contarOcorrencias(Node **hashList, const char *word) {
+  int hash = hashear(word);
+  Node *aux = hashList[hash];
+  while (aux != NULL) {
+    if (strcmp(aux->palavra, word) == 0) {
+      return aux->quantidade;
+    }
+    aux = aux->prox;
+  }
+  return 0;
+}
+
+void printMenu() {
+  printf("\n----- MENU -----\n");
+  printf("0 - Encerrar o programa\n");
+  printf("1 - Inserir frase\n");
+  printf("2 - Consultar palavra\n");
+  printf("3 - Remover palavra\n");
+  printf("4 - Contar palavras\n");
+  printf("5 - Exibir palavras em ordem alfabética\n");
+  printf("6 - Buscar palavras que iniciam com uma letra\n");
+  printf("7 - Exibir palavras em ordem de número de ocorrências\n");
+  printf("8 - Exibir palavras com um determinado número de ocorrências\n");
+  printf("Digite a opção desejada: ");
 }
 
 int main() {
@@ -238,17 +314,8 @@ int main() {
 
   int option = -1;
   while (option != 0) {
-    printf("\n----- MENU -----\n");
-    printf("0 - Encerrar o programa\n");
-    printf("1 - Inserir frase\n");
-    printf("2 - Consultar palavra\n");
-    printf("3 - Remover palavra\n");
-    printf("4 - Contar palavras\n");
-    printf("5 - Exibir palavras em ordem alfabética\n");
-    printf("6 - Buscar palavras que iniciam com uma letra\n");
-    printf("7 - Exibir palavras em ordem de número de ocorrências\n");
-    printf("8 - Exibir palavras com um determinado número de ocorrências\n");
-    printf("Digite a opção desejada: ");
+    limparConsole();
+    printMenu();
     scanf("%d", &option);
     getchar();
 
@@ -265,13 +332,16 @@ int main() {
       while (word != NULL) {
         if (isalpha(word[0])) {
           word[0] = tolower(word[0]);
-          insertWord(hashList, word);
+          inserePalavra(hashList, word);
         }
         word = strtok(NULL, " \n");
       }
 
+      limparConsole();
       printf("\nPalavras e suas contagens:\n");
-      printHashList(hashList, 1);
+      printarHashList(hashList, 1);
+      printf("Pressione ENTER para continuar...");
+      getchar();
       break;
     }
     case 2: {
@@ -279,36 +349,50 @@ int main() {
       char word[50];
       scanf("%s", word);
 
-      Node *current = head;
-      while (current != NULL) {
-        if (strcmp(current->word, word) == 0) {
-          printf("A palavra '%s' ocorre %d vez(es).\n", word, current->count);
-          break;
-        }
-        current = current->next;
+      int wordCount = contarOcorrencias(hashList, word);
+
+
+      if (wordCount == 0) {
+        printf("A palavra '%s' não foi encontrada.\n", word);
+      } else if (wordCount == 1) {
+        printf("A palavra '%s' ocorre %d vez.\n", word, wordCount);
+      } else {
+        printf("A palavra '%s' ocorre %d vezes.\n", word, wordCount);
       }
-      if (current == NULL) {
-        printf("A palavra '%s' não foi encontrada na lista.\n", word);
-      }
+
+      printf("Pressione ENTER para continuar...");
+      getchar();
+      getchar();
       break;
     }
     case 3: {
       printf("Digite a palavra para remover: ");
       char word[50];
       scanf("%s", word);
-      removeWord(hashList, word);
+      limparConsole();
+      removePalavra(hashList, word);
+      printf("Pressione ENTER para continuar...");
+      getchar();
+      getchar();
       break;
     }
     case 4: {
-      int count = countHashList(hashList);
+      int count = contarHashList(hashList);
+      limparConsole();
       printf("O número de palavras na lista é: %d\n", count);
+      printf("Pressione ENTER para continuar...");
+      getchar();
       break;
     }
     case 5: {
       int sortOption;
       printf("Digite '1' para ordem A-Z ou '2' para ordem Z-A: ");
       scanf("%d", &sortOption);
-      printHashList(hashList, sortOption);
+      limparConsole();
+      printarHashList(hashList, sortOption);
+      printf("Pressione ENTER para continuar...");
+      getchar();
+      getchar();
       break;
     }
     case 6: {
@@ -319,11 +403,18 @@ int main() {
       printf("Digite '1' para ordem A-Z ou '2' para ordem Z-A: ");
       scanf("%d", &sortOption);
 
-      searchWordsByLetter(hashList, letter, sortOption);
+      limparConsole();
+      buscarPorLetra(hashList, letter, sortOption);
+      printf("Pressione ENTER para continuar...");
+      getchar();
+      getchar();
       break;
     }
     case 7: {
-      printOrderedByCount(hashList);
+      limparConsole();
+      printarOrdenadoPorQuantidade(hashList);
+      printf("Pressione ENTER para continuar...");
+      getchar();
       break;
     }
     case 8: {
@@ -331,7 +422,11 @@ int main() {
       printf("Digite o número de ocorrências: ");
       scanf("%d", &count);
 
-      searchWordsByCount(hashList, count);
+      limparConsole();
+      buscarPorOcorrencias(hashList, count);
+      printf("Pressione ENTER para continuar...");
+      getchar();
+      getchar();
       break;
     }
     default:
@@ -340,7 +435,7 @@ int main() {
     }
   }
 
-  freeHashList(hashList);
+  limparHashList(hashList);
 
   return 0;
 }
