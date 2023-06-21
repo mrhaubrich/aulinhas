@@ -7,14 +7,14 @@
 typedef struct Node {
   int data;
   int operacao;
-  struct Node *left, *right;
+  struct Node *esquerda, *direita;
 } Node;
 
 // A utility function to create a new Binary Tree node
 Node *newNode(int data) {
   Node *temp = (Node *)malloc(sizeof(Node));
   temp->data = data;
-  temp->left = temp->right = NULL;
+  temp->esquerda = temp->direita = NULL;
   return temp;
 }
 
@@ -31,9 +31,9 @@ void findMinMax(Node *node, int *min, int *max, int hd) {
   else if (hd > *max)
     *max = hd;
 
-  // Recur for left and right subtrees
-  findMinMax(node->left, min, max, hd - 1);
-  findMinMax(node->right, min, max, hd + 1);
+  // Recur for esquerda and direita subtrees
+  findMinMax(node->esquerda, min, max, hd - 1);
+  findMinMax(node->direita, min, max, hd + 1);
 }
 
 void printBT(char *prefix, const Node *node, int isLeft) {
@@ -44,7 +44,7 @@ void printBT(char *prefix, const Node *node, int isLeft) {
 
     printf("%d", node->data);
     if (node->operacao == 1) {
-        printf("<----");
+      printf("<----");
     }
     printf("\n");
 
@@ -52,59 +52,96 @@ void printBT(char *prefix, const Node *node, int isLeft) {
     strcpy(newPrefix, prefix);
     strcat(newPrefix, (isLeft == 1 ? "|   " : "    "));
 
-    printBT(newPrefix, node->left, 1);
-    printBT(newPrefix, node->right, 0);
+    printBT(newPrefix, node->esquerda, 1);
+    printBT(newPrefix, node->direita, 0);
   }
 }
 
 void printTree(Node *node) { printBT("", node, 0); }
 
-Node* MAIN_ROOT;
+Node *MAIN_ROOT = NULL;
 // function to sort the tree in descending order
-void invertTree(Node *root) {
+void invertTree(Node *root, int verbose) {
   if (root == NULL)
     return;
-
-  root->operacao = 1;
-  // wait 1 secont
-  sleep(1);
-  system("clear");
-  // clear console
-  printBT("", MAIN_ROOT, 0);
+  if (verbose == 1) {
+    root->operacao = 1;
+    // wait 1 secont
+    sleep(1);
+    system("clear");
+    // clear console
+    printBT("", MAIN_ROOT, 0);
+  }
 
   // recursively traverse the tree in postorder fashion
-  invertTree(root->left);
-  invertTree(root->right);
+  invertTree(root->esquerda, verbose);
+  invertTree(root->direita, verbose);
 
-  // swap the data of the node with the right most node
-  if (root->left && root->right) {
-    Node *temp = root->left;
-    root->left = root->right;
-    root->right = temp;
+  // swap the data of the node with the direita most node
+  if (root->esquerda && root->direita) {
+    Node *temp = root->esquerda;
+    root->esquerda = root->direita;
+    root->direita = temp;
   }
   root->operacao = 0;
 }
 
+void adicionarOrdenado(Node *root, int data) {
+  if (root == NULL) {
+    root = newNode(data);
+    return;
+  }
+  // root->operacao = 1;
+  sleep(1);
+  system("clear");
+
+  printBT("", MAIN_ROOT, 0);
+
+  if (data < root->data) {
+    if (root->esquerda == NULL) {
+      root->esquerda = newNode(data);
+      return;
+    } else {
+      adicionarOrdenado(root->esquerda, data);
+    }
+  } else {
+    if (root->direita == NULL) {
+      root->direita = newNode(data);
+      return;
+    } else {
+      adicionarOrdenado(root->direita, data);
+    }
+  }
+  // root->operacao = 0;
+}
 
 // Driver program to test above functions
 int main() {
-  MAIN_ROOT = newNode(1);
+  // MAIN_ROOT = (Node *)malloc(sizeof(Node));
   // Create binary tree shown in above figure
-  MAIN_ROOT->left = newNode(2);
-  MAIN_ROOT->right = newNode(3);
-  MAIN_ROOT->left->left = newNode(4);
-  MAIN_ROOT->left->right = newNode(5);
-  MAIN_ROOT->right->left = newNode(6);
-  MAIN_ROOT->right->right = newNode(7);
-  MAIN_ROOT->right->left->right = newNode(10);
-  MAIN_ROOT->right->right->right = newNode(9);
-  MAIN_ROOT->right->right->left = newNode(8);
+  // MAIN_ROOT->esquerda = newNode(2);
+  // MAIN_ROOT->direita = newNode(3);
+  // MAIN_ROOT->esquerda->esquerda = newNode(4);
+  // MAIN_ROOT->esquerda->direita = newNode(5);
+  // MAIN_ROOT->direita->esquerda = newNode(6);
+  // MAIN_ROOT->direita->direita = newNode(7);
+  // MAIN_ROOT->direita->esquerda->direita = newNode(10);
+  // MAIN_ROOT->direita->direita->direita = newNode(9);
+  // MAIN_ROOT->direita->direita->esquerda = newNode(8);
+
+  // array de numeros
+  int numeros[] = {5, 3, 7, 2, 4, 6, 8, 1, 9, 10};
+
+  // adicionar os numeros na arvore
+  for (int i = 0; i < 10; i++) {
+    adicionarOrdenado(MAIN_ROOT, numeros[i]);
+  }
 
   system("clear");
   printTree(MAIN_ROOT);
   sleep(2);
 
-  invertTree(MAIN_ROOT);
+  invertTree(MAIN_ROOT, 0);
   system("clear");
   printTree(MAIN_ROOT);
 
