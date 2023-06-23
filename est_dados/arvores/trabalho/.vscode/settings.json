@@ -1,0 +1,12 @@
+{
+    "python.linting.cwd": "${workspaceFolder}",
+
+    "python.linting.prospectorArgs": [
+        "--pylint-config-file",
+        "/etc/pylintrc",
+    ],
+    "python.linting.ignorePatterns": [
+        "**/site-packages/**/*.py",
+        ".vscode/*.py",
+    ]
+}

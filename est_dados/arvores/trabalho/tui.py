@@ -19,7 +19,7 @@ class Tui:
         "5. Contar ocorrências de uma palavra",
         "6. Exibe palavras por letra",
         "7. Exibe palavra com maior número de ocorrências",
-        "8. Exibir palavras com uma ocorrencia",
+        "8. Exibir palavras com uma única ocorrencia",
         # TODO: Adicionar outras
         "9. Ler arquivo",
     ]
@@ -32,9 +32,9 @@ class Tui:
             self.print_main_menu()
             option = input("Digite a opção: ")
             if option == "1":
-                self.insert()
+                self.inserir()
             elif option == "2":
-                self.search()
+                self.buscar()
             elif option == "3":
                 self.remove()
             elif option == "4":
@@ -46,28 +46,38 @@ class Tui:
             elif option == "7":
                 self.print_most_occur()
             elif option == "8":
-                self.print_by_occur()
+                self.print_one_occur()
             elif option == "9":
                 self.read_file()
             else:
                 print("Opção inválida")
 
     def print_main_menu(self):
+        console.clear()
         console.print("Menu principal", style="bold underline")
         for option in self.main_menu:
             console.print(option)
 
-    def insert(self):
+    def inserir(self):
         word = console.input("Digite a palavra: ")
-        self.hash_list.insert(word)
+        self.hash_list.inserir(word)
         print("Palavra inserida com sucesso")
 
-    def search(self):
+    def buscar(self):
         word = input("Digite a palavra: ")
-        if self.hash_list.search(word):
-            print("Palavra encontrada")
+        palavra = self.hash_list.buscar(word)
+        table = None
+        console.clear()
+        if palavra is not None:
+            table = Table(title="Palavra encontrada")
+            table.add_column("Palavra")
+            table.add_column("Ocorrências")
+            table.add_row(palavra.valor, str(palavra.quantidade))
         else:
-            print("Palavra não encontrada")
+            console.print("Palavra não encontrada", style="bold red")
+        if table:
+            console.print(table)
+        self.press_any_key()
 
     def remove(self):
         word = input("Digite a palavra: ")
@@ -89,17 +99,37 @@ class Tui:
 
     def print_most_occur(self):
         most_occur = self.hash_list.get_most_occur()
-        console.print(f"Palavra com mais ocorrências: {most_occur}")
+        table = Table(title="Palavra com mais ocorrências")
+        table.add_column("Palavra")
+        table.add_column("Ocorrências")
+        table.add_row(most_occur.valor, str(most_occur.quantidade))
+        console.clear()
+        console.print(table)
+        self.press_any_key()
 
     def print_by_occur(self):
         occur = int(input("Digite a quantidade de ocorrências: "))
         self.hash_list.print_by_occur(occur)
+
+    def print_one_occur(self):
+        words = self.hash_list.get_one_occur()
+        table = Table(title="Palavras com uma única ocorrência")
+        table.add_column("Palavra")
+        table.add_column("Ocorrências")
+        for word in words:
+            table.add_row(word.valor, str(word.quantidade))
+        console.clear(False)
+        console.print(table)
+        self.press_any_key()
 
     def read_file(self):
         file_name = console.input("Digite o nome do arquivo (padrão: texto.txt): ")
         if file_name == "":
             file_name = "texto.txt"
         self.hash_list.read_file(file_name)
+
+    def press_any_key(self):
+        console.input("Pressione qualquer tecla para continuar...")
 
         
 if __name__ == "__main__":

@@ -78,7 +78,7 @@ class AVL:
     def _inserir(self, valor, no: Node):
         if no is None:
             return Node(valor)
-        elif valor < no.valor:
+        if valor < no.valor:
             no.esquerda = self._inserir(valor, no.esquerda)
             if self.altura(no.esquerda) - self.altura(no.direita) == 2:
                 if valor < no.esquerda.valor:
@@ -103,7 +103,7 @@ class AVL:
     def _remover(self, valor, no: Node):
         if no is None:
             return None
-        elif valor < no.valor:
+        if valor < no.valor:
             no.esquerda = self._remover(valor, no.esquerda)
             if self.altura(no.direita) - self.altura(no.esquerda) == 2:
                 if self.altura(no.direita.direita) >= self.altura(no.direita.esquerda):
@@ -144,12 +144,11 @@ class AVL:
     def _buscar(self, valor, no: Node):
         if no is None:
             return None
-        elif valor < no.valor:
+        if valor < no.valor:
             return self._buscar(valor, no.esquerda)
-        elif valor > no.valor:
+        if valor > no.valor:
             return self._buscar(valor, no.direita)
-        else:
-            return no
+        return no
 
     def __contains__(self, valor):
         return self.buscar(valor) is not None
@@ -172,9 +171,6 @@ class AVL:
             yield from self._iter(no.direita)
 
     def __repr__(self):
-        return f"ArvoreAVL({self.raiz})"
-
-    def __str__(self):
         return f"ArvoreAVL({self.raiz})"
 
     def __getitem__(self, valor):
@@ -207,19 +203,37 @@ class AVL:
     def print(self):
         print(self)
 
-    def get_most_occur(self) -> Node or None:
-        self.most_occur: Node or None = None
-        return self._get_most_occur(self.raiz)
+    def pega_node_com_maior_quantidade(self):
+        return self._pega_node_com_maior_quantidade(self.raiz)
+
+    def _pega_node_com_maior_quantidade(self, no: Node):
+        if no is None:
+            return None
+        no_original = no
+        maior_quantidade = no
+        while no is not None:
+            if no.quantidade > maior_quantidade.quantidade:
+                maior_quantidade = no
+            no = no.direita
+        no = no_original
+        while no is not None:
+            if no.quantidade > maior_quantidade.quantidade:
+                maior_quantidade = no
+            no = no.esquerda
+        return maior_quantidade
     
-    def _get_most_occur(self, no: Node) -> Node or None:
-        if no is not None:
-            self._get_most_occur(no.esquerda)
-            if self.most_occur is None:
-                self.most_occur = no
-            if no.quantidade > self.most_occur.quantidade:
-                self.most_occur = no
-            self._get_most_occur(no.direita)
-        return self.most_occur
+    def pega_todos_com_uma_quantidade(self):
+        return self._pega_todos_com_uma_quantidade(self.raiz)
+    
+    def _pega_todos_com_uma_quantidade(self, no: Node) -> list[Node]:
+        if no is None:
+            return []
+        lista = []
+        if no.quantidade == 1:
+            lista.append(no)
+        lista += self._pega_todos_com_uma_quantidade(no.esquerda)
+        lista += self._pega_todos_com_uma_quantidade(no.direita)
+        return lista
 
 
 if __name__ == "__main__":
