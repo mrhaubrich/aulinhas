@@ -103,7 +103,9 @@ class Tui:
         self.press_any_key()
 
     def count(self):
-        print(f"Quantidade de palavras: {self.hash_list.count()}")
+        console.clear()
+        console.print(f"Quantidade de palavras: {len(self.hash_list)}")
+        self.press_any_key()
 
     def count_word(self):
         word = input("Digite a palavra: ")

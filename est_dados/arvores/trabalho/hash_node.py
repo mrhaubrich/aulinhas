@@ -34,3 +34,8 @@ class HashNode:
 
     def remover(self, value: str):
         return self.value.remover(value)
+    
+    def __len__(self):
+        if self.value is None:
+            return 0
+        return len(self.value)

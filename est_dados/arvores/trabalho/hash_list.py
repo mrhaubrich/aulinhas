@@ -81,6 +81,10 @@ class HashList:
         if self._list[index] is None:
             return False
         return self._list[index].remover(value)
+    
+    def __len__(self):
+        # if item is none return 0
+        return sum(len(i) for i in self._list if i is not None)
 
 
 def remove_acentuacao(val: str) -> str:
