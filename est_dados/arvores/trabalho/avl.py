@@ -1,3 +1,6 @@
+from typing import Tuple
+
+
 class Node:
     valor: str = None
     quantidade: int = 1
@@ -98,20 +101,23 @@ class AVL:
         return no
 
     def remover(self, valor):
-        self.raiz = self._remover(valor, self.raiz)
+        # return false if not found
+        (self.raiz, achou) = self._remover(valor, self.raiz)
+        return achou
 
-    def _remover(self, valor, no: Node):
+    def _remover(self, valor, no: Node) -> Tuple[Node | None, bool]:
+        achou = False
         if no is None:
-            return None
+            return (None, achou)
         if valor < no.valor:
-            no.esquerda = self._remover(valor, no.esquerda)
+            (no.esquerda, achou) = self._remover(valor, no.esquerda)
             if self.altura(no.direita) - self.altura(no.esquerda) == 2:
                 if self.altura(no.direita.direita) >= self.altura(no.direita.esquerda):
                     no = self.rotacao_esquerda(no)
                 else:
                     no = self.rotacao_dupla_esquerda(no)
         elif valor > no.valor:
-            no.direita = self._remover(valor, no.direita)
+            (no.direita, achou) = self._remover(valor, no.direita)
             if self.altura(no.esquerda) - self.altura(no.direita) == 2:
                 if self.altura(no.esquerda.esquerda) >= self.altura(
                     no.esquerda.direita
@@ -121,14 +127,16 @@ class AVL:
                     no = self.rotacao_dupla_direita(no)
         elif no.esquerda is not None and no.direita is not None:
             no.valor = self._minimo(no.direita).valor
-            no.direita = self._remover(no.valor, no.direita)
+            (no.direita, achou) = self._remover(no.valor, no.direita)
         else:
             no = no.esquerda if no.esquerda is not None else no.direita
+            achou = True
         if no is not None:
             no.altura = max(self.altura(no.esquerda), self.altura(no.direita)) + 1
-        return no
+        return (no, achou)
 
-    def _minimo(self, no: Node):
+    def _minimo(self, no: Node) -> Node:
+        """Retorna o nó com o menor valor da subárvore."""
         while no.esquerda is not None:
             no = no.esquerda
         return no
@@ -221,10 +229,10 @@ class AVL:
                 maior_quantidade = no
             no = no.esquerda
         return maior_quantidade
-    
+
     def pega_todos_com_uma_quantidade(self):
         return self._pega_todos_com_uma_quantidade(self.raiz)
-    
+
     def _pega_todos_com_uma_quantidade(self, no: Node) -> list[Node]:
         if no is None:
             return []

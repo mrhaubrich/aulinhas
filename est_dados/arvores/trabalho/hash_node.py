@@ -28,9 +28,9 @@ class HashNode:
 
     def __str__(self):
         return str(self.value)
-    
+
     def __getitem__(self, value):
         return self.value[value]
-    
+
     def remover(self, value: str):
-        self.value.remover(value)
+        return self.value.remover(value)

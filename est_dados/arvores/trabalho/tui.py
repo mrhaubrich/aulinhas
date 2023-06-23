@@ -11,18 +11,45 @@ console = Console()
 
 
 class Tui:
-    main_menu = [
-        "1. Inserir palavra",
-        "2. Consultar palavra",
-        "3. Remover palavra",
-        "4. Contar quantidade de palavras",
-        "5. Contar ocorrências de uma palavra",
-        "6. Exibe palavras por letra",
-        "7. Exibe palavra com maior número de ocorrências",
-        "8. Exibir palavras com uma única ocorrencia",
-        # TODO: Adicionar outras
-        "9. Ler arquivo",
-    ]
+    def get_main_menu(self):
+        return {
+            "1": {
+                "text": "Inserir palavra",
+                "function": self.inserir,
+            },
+            "2": {
+                "text": "Consultar palavra",
+                "function": self.buscar,
+            },
+            "3": {
+                "text": "Remover palavra",
+                "function": self.remover,
+            },
+            "4": {
+                "text": "Contar quantidade de palavras",
+                "function": self.count,
+            },
+            "5": {
+                "text": "Contar ocorrências de uma palavra",
+                "function": self.count_word,
+            },
+            "6": {
+                "text": "Exibe palavras por letra",
+                "function": self.print_by_letter,
+            },
+            "7": {
+                "text": "Exibe palavra com maior número de ocorrências",
+                "function": self.print_most_occur,
+            },
+            "8": {
+                "text": "Exibir palavras com uma única ocorrencia",
+                "function": self.print_one_occur,
+            },
+            "9": {
+                "text": "Ler arquivo",
+                "function": self.read_file,
+            },
+        }
 
     def __init__(self):
         self.hash_list = HashList()
@@ -30,33 +57,20 @@ class Tui:
     def main(self):
         while True:
             self.print_main_menu()
-            option = input("Digite a opção: ")
-            if option == "1":
-                self.inserir()
-            elif option == "2":
-                self.buscar()
-            elif option == "3":
-                self.remover()
-            elif option == "4":
-                self.count()
-            elif option == "5":
-                self.count_word()
-            elif option == "6":
-                self.print_by_letter()
-            elif option == "7":
-                self.print_most_occur()
-            elif option == "8":
-                self.print_one_occur()
-            elif option == "9":
-                self.read_file()
-            else:
-                print("Opção inválida")
+            option = console.input("Digite a opção: ")
+            if option == "0":
+                break
+            try:
+                self.get_main_menu()[option]["function"]()
+            except KeyError:
+                console.print("Opção inválida", style="bold red")
+                self.press_any_key()
 
     def print_main_menu(self):
         console.clear()
-        console.print("Menu principal", style="bold underline")
-        for option in self.main_menu:
-            console.print(option)
+        console.print("Menu principal", style="bold")
+        for key, value in self.get_main_menu().items():
+            console.print(f"{key}. {value['text']}")
 
     def inserir(self):
         word = console.input("Digite a palavra: ")
@@ -81,14 +95,16 @@ class Tui:
 
     def remover(self):
         palavra = console.input("Digite a palavra: ")
-        self.hash_list.remover(palavra)
         console.clear()
-        console.print("Palavra removida com sucesso", style="bold green")
+        if self.hash_list.remover(palavra):
+            console.print("Palavra removida com sucesso", style="bold green")
+        else:
+            console.print("Palavra não encontrada", style="bold red")
         self.press_any_key()
 
     def count(self):
         print(f"Quantidade de palavras: {self.hash_list.count()}")
-            
+
     def count_word(self):
         word = input("Digite a palavra: ")
         print(f"Quantidade de ocorrências: {self.hash_list.count_word(word)}")
@@ -131,7 +147,7 @@ class Tui:
     def press_any_key(self):
         console.input("Pressione qualquer tecla para continuar...")
 
-        
+
 if __name__ == "__main__":
     tui = Tui()
     tui.main()

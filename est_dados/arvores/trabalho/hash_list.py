@@ -57,7 +57,7 @@ class HashList:
         return s
 
     def read_file(self, filename: str):
-        with open(filename, encoding='utf-8') as f:
+        with open(filename, encoding="utf-8") as f:
             for word in remove_pontuacao(f.read()).split():
                 self.inserir(word.strip())
 
@@ -69,18 +69,18 @@ class HashList:
                 if node is not None:
                     one_occur.extend(node)
         return one_occur
-    
+
     def buscar(self, value: str):
         index = _hash_function(value)
         if self._list[index] is None:
             return None
         return self._list[index][value]
-    
-    def remover(self, value: str):
+
+    def remover(self, value: str) -> bool:
         index = _hash_function(value)
         if self._list[index] is None:
-            return None
-        return self._list[index].value.remover(value)
+            return False
+        return self._list[index].remover(value)
 
 
 def remove_acentuacao(val: str) -> str:
