@@ -75,6 +75,12 @@ class HashList:
         if self._list[index] is None:
             return None
         return self._list[index][value]
+    
+    def remover(self, value: str):
+        index = _hash_function(value)
+        if self._list[index] is None:
+            return None
+        return self._list[index].value.remover(value)
 
 
 def remove_acentuacao(val: str) -> str:

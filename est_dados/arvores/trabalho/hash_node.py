@@ -31,3 +31,6 @@ class HashNode:
     
     def __getitem__(self, value):
         return self.value[value]
+    
+    def remover(self, value: str):
+        self.value.remover(value)

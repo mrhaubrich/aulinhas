@@ -36,7 +36,7 @@ class Tui:
             elif option == "2":
                 self.buscar()
             elif option == "3":
-                self.remove()
+                self.remover()
             elif option == "4":
                 self.count()
             elif option == "5":
@@ -79,12 +79,12 @@ class Tui:
             console.print(table)
         self.press_any_key()
 
-    def remove(self):
-        word = input("Digite a palavra: ")
-        if self.hash_list.remove(word):
-            print("Palavra removida com sucesso")
-        else:
-            print("Palavra não encontrada")
+    def remover(self):
+        palavra = console.input("Digite a palavra: ")
+        self.hash_list.remover(palavra)
+        console.clear()
+        console.print("Palavra removida com sucesso", style="bold green")
+        self.press_any_key()
 
     def count(self):
         print(f"Quantidade de palavras: {self.hash_list.count()}")
