@@ -1,5 +1,6 @@
 class Node:
     valor: str = None
+    quantidade: int = 1
     esquerda: "Node" = None
     direita: "Node" = None
     altura = 0
@@ -91,6 +92,8 @@ class AVL:
                     no = self.rotacao_esquerda(no)
                 else:
                     no = self.rotacao_dupla_esquerda(no)
+        else:
+            no.quantidade += 1
         no.altura = max(self.altura(no.esquerda), self.altura(no.direita)) + 1
         return no
 
@@ -187,18 +190,37 @@ class AVL:
     def __delitem__(self, valor):
         self.remover(valor)
 
-    def _print(self, prefix, no: Node, is_left):
+    def __str__(self):
+        return self._str("", self.raiz, None)
+
+    def _str(self, prefix, no: Node, is_left) -> str:
         if no is not None:
-            print(prefix, end="")
-            print("├──" if is_left == 1 else "└──", end="")
-            print(no.valor, end="")
-            print()
+            s = prefix
+            s += "├──" if is_left == 1 else "└──"
+            s += f"{no.valor}({no.quantidade})\n"
             new_prefix = prefix + ("|   " if is_left == 1 else "    ")
-            self._print(new_prefix, no.esquerda, 1)
-            self._print(new_prefix, no.direita, 0)
+            s += self._str(new_prefix, no.esquerda, 1)
+            s += self._str(new_prefix, no.direita, 0)
+            return s
+        return ""
 
     def print(self):
-        self._print("", self.raiz, None)
+        print(self)
+
+    def get_most_occur(self) -> Node or None:
+        self.most_occur: Node or None = None
+        return self._get_most_occur(self.raiz)
+    
+    def _get_most_occur(self, no: Node) -> Node or None:
+        if no is not None:
+            self._get_most_occur(no.esquerda)
+            if self.most_occur is None:
+                self.most_occur = no
+            if no.quantidade > self.most_occur.quantidade:
+                self.most_occur = no
+            self._get_most_occur(no.direita)
+        return self.most_occur
+
 
 if __name__ == "__main__":
     arvore = AVL()
