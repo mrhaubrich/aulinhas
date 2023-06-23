@@ -32,10 +32,20 @@ class HashList:
             self._list[index] = HashNode(AVL())
         self._list[index].inserir(value)
 
-    def print(self):
-        for i in self._list:
+    def print(self, reverse = False):
+        lista = reversed(self._list) if reverse else self._list
+        for i in lista:
             if i is not None:
                 i.print()
+            # else:
+            #     print('|   None')
+
+    def print_with_letter(self, letter, reverse = False):
+        lista = reversed(self._list) if reverse else self._list
+        for i in lista:
+            if i is not None:
+                if i.value[0] == letter:
+                    i.print()
             # else:
             #     print('|   None')
 

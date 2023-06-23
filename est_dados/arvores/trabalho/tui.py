@@ -49,6 +49,10 @@ class Tui:
                 "text": "Ler arquivo",
                 "function": self.read_file,
             },
+            "10": {
+                "text": "Exibe a lista das palavras da estrutura",
+                "function": self.print_all_words,
+            },
         }
 
     def __init__(self):
@@ -109,11 +113,33 @@ class Tui:
 
     def count_word(self):
         word = input("Digite a palavra: ")
-        print(f"Quantidade de ocorrências: {self.hash_list.count_word(word)}")
+        console.print(f"Quantidade de ocorrências: {self.hash_list.count_word(word)}")
+        self.press_any_key()
 
     def print_by_letter(self):
+        print(self._list)
+        print(self._list[0])
         letter = input("Digite a letra: ")
-        self.hash_list.print_by_letter(letter)
+        order = input("1 - Ordem A-Z\n2 - Ordem Z-A\n")
+        if order == "1":
+            self.hash_list.print_with_letter(letter, False)
+        elif order == "2": 
+            self.hash_list.print_with_letter(letter, True)
+        else:
+            console.print("Opção inválida", style="bold red")
+        
+        self.press_any_key()
+
+    def print_all_words(self):
+        order = input("1 - Ordem A-Z\n2 - Ordem Z-A\n")
+        if order == "1":
+            self.hash_list.print(False)
+        elif order == "2": 
+            self.hash_list.print(True)
+        else:
+            console.print("Opção inválida", style="bold red")
+        
+        self.press_any_key()
 
     def print_most_occur(self):
         most_occur = self.hash_list.get_most_occur()
