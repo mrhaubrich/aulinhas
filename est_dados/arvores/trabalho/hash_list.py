@@ -55,7 +55,7 @@ class HashList:
                 if remove_acentuacao(
                     remove_pontuacao(i.value.first().valor[0].lower())
                 ) == remove_acentuacao(remove_pontuacao(letter.lower())):
-                    _lista.extend(i.to_list())
+                    _lista.extend(i.to_list(reverse))
 
         return _lista
 
