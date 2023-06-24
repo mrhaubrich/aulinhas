@@ -14,28 +14,7 @@ class Node:
         self.valor = valor
 
     def __str__(self):
-        return str(self.valor)
-
-    def __repr__(self):
-        return str(self.valor)
-
-    def __eq__(self, other):
-        return self.valor == other.valor
-
-    def __ne__(self, other):
-        return self.valor != other.valor
-
-    def __lt__(self, other):
-        return self.valor < other.valor
-
-    def __le__(self, other):
-        return self.valor <= other.valor
-
-    def __gt__(self, other):
-        return self.valor > other.valor
-
-    def __ge__(self, other):
-        return self.valor >= other.valor
+        return self.valor
 
 
 class AVL:
@@ -111,7 +90,6 @@ class AVL:
         return no
 
     def remover(self, valor):
-        # return false if not found
         (self.raiz, achou) = self._remover(valor, self.raiz)
         return achou
 

@@ -5,18 +5,11 @@
 # the value is the word
 # the hash table is a list of linked lists
 
-import re
 import sys
-
-from rich import console as _console, pretty
 
 from avl import AVL, Node
 from hash_node import HashNode
 from utils import remove_acentuacao, remove_pontuacao
-
-pretty.install()
-
-console = _console.Console()
 
 
 def _hash_function(value: str):
@@ -51,7 +44,7 @@ class HashList:
                     _lista.extend(i.to_list(reverse))
 
         return _lista
-    
+
     def to_list(self, reverse=False):
         lista = reversed(self._list) if reverse else self._list
         _lista: list[Node] = []
@@ -109,14 +102,4 @@ class HashList:
         return self._list[index].remover(value)
 
     def __len__(self):
-        # if item is none return 0
         return sum(len(i) for i in self._list if i is not None)
-
-
-if __name__ == "__main__":
-    hash_list = HashList()
-
-    hash_list.read_file("texto.txt")
-
-    console.print(hash_list)
-    sys.exit(0)

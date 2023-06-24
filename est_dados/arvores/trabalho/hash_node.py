@@ -39,7 +39,6 @@ class HashNode:
         return self.value.to_str(reverse)
     
     def to_list(self, reverse=False):
-        # use yield
         return self.value.to_list(reverse)
     
     def first(self):
