@@ -20,21 +20,22 @@ class Node:
 class AVL:
     raiz: Node = None
 
-    def altura(self, no: Node):
-        if no is None:
-            return -1
-        return no.altura
+    def first(self) -> Node | None:
+        return self.raiz
+    
+    def to_list(self, reverse=False):
+        return self._to_list(self.raiz, reverse)
 
     def fator_balanceamento(self, no: Node):
-        return self.altura(no.direita) - self.altura(no.esquerda)
+        return self._altura(no.direita) - self._altura(no.esquerda)
 
     def rotacao_esquerda(self, no: Node):
         nova_raiz = no.direita
         no.direita = nova_raiz.esquerda
         nova_raiz.esquerda = no
-        no.altura = max(self.altura(no.esquerda), self.altura(no.direita)) + 1
+        no.altura = max(self._altura(no.esquerda), self._altura(no.direita)) + 1
         nova_raiz.altura = (
-            max(self.altura(nova_raiz.esquerda), self.altura(nova_raiz.direita)) + 1
+            max(self._altura(nova_raiz.esquerda), self._altura(nova_raiz.direita)) + 1
         )
         return nova_raiz
 
@@ -42,9 +43,9 @@ class AVL:
         nova_raiz = no.esquerda
         no.esquerda = nova_raiz.direita
         nova_raiz.direita = no
-        no.altura = max(self.altura(no.esquerda), self.altura(no.direita)) + 1
+        no.altura = max(self._altura(no.esquerda), self._altura(no.direita)) + 1
         nova_raiz.altura = (
-            max(self.altura(nova_raiz.esquerda), self.altura(nova_raiz.direita)) + 1
+            max(self._altura(nova_raiz.esquerda), self._altura(nova_raiz.direita)) + 1
         )
         return nova_raiz
 
@@ -62,32 +63,43 @@ class AVL:
     def _inserir(self, valor: str, no: Node):
         if no is None:
             return Node(valor)
-        if remove_acentuacao(remove_pontuacao(valor.lower())) < remove_acentuacao(
-            remove_pontuacao(no.valor.lower())
-        ):
+
+        valor_atual = remove_acentuacao(remove_pontuacao(no.valor.lower()))
+        valor_novo = remove_acentuacao(remove_pontuacao(valor.lower()))
+
+        if valor_novo < valor_atual:
             no.esquerda = self._inserir(valor, no.esquerda)
-            if self.altura(no.esquerda) - self.altura(no.direita) == 2:
-                if remove_acentuacao(
-                    remove_pontuacao(valor.lower())
-                ) < remove_acentuacao(remove_pontuacao(no.esquerda.valor.lower())):
-                    no = self.rotacao_direita(no)
-                else:
-                    no = self.rotacao_dupla_direita(no)
-        elif remove_acentuacao(remove_pontuacao(valor.lower())) > remove_acentuacao(
-            remove_pontuacao(no.valor.lower())
-        ):
+        elif valor_novo > valor_atual:
             no.direita = self._inserir(valor, no.direita)
-            if self.altura(no.direita) - self.altura(no.esquerda) == 2:
-                if remove_acentuacao(
-                    remove_pontuacao(valor.lower())
-                ) > remove_acentuacao(remove_pontuacao(no.direita.valor.lower())):
-                    no = self.rotacao_esquerda(no)
-                else:
-                    no = self.rotacao_dupla_esquerda(no)
         else:
             no.quantidade += 1
-        no.altura = max(self.altura(no.esquerda), self.altura(no.direita)) + 1
+            return no
+
+        no.altura = max(self._altura(no.esquerda), self._altura(no.direita)) + 1
+
+        no = self._balancear(no, valor_novo, valor_atual)
+
         return no
+    
+
+    def _balancear(self, no: Node, valor_novo: str, valor_atual: str):
+        fator_balanceamento = self.fator_balanceamento(no)
+
+        if fator_balanceamento == -2:
+            valor_filho_esquerda = remove_acentuacao(remove_pontuacao(no.esquerda.valor.lower()))
+            if valor_novo < valor_filho_esquerda:
+                no = self.rotacao_direita(no)
+            else:
+                no = self.rotacao_dupla_direita(no)
+        elif fator_balanceamento == 2:
+            valor_filho_direita = remove_acentuacao(remove_pontuacao(no.direita.valor.lower()))
+            if valor_novo > valor_filho_direita:
+                no = self.rotacao_esquerda(no)
+            else:
+                no = self.rotacao_dupla_esquerda(no)
+
+        return no
+
 
     def remover(self, valor):
         (self.raiz, achou) = self._remover(valor, self.raiz)
@@ -99,15 +111,15 @@ class AVL:
             return (None, achou)
         if valor < no.valor:
             (no.esquerda, achou) = self._remover(valor, no.esquerda)
-            if self.altura(no.direita) - self.altura(no.esquerda) == 2:
-                if self.altura(no.direita.direita) >= self.altura(no.direita.esquerda):
+            if self.fator_balanceamento(no) == 2:
+                if self._altura(no.direita.direita) >= self._altura(no.direita.esquerda):
                     no = self.rotacao_esquerda(no)
                 else:
                     no = self.rotacao_dupla_esquerda(no)
         elif valor > no.valor:
             (no.direita, achou) = self._remover(valor, no.direita)
-            if self.altura(no.esquerda) - self.altura(no.direita) == 2:
-                if self.altura(no.esquerda.esquerda) >= self.altura(
+            if self.fator_balanceamento(no) == -2:
+                if self._altura(no.esquerda.esquerda) >= self._altura(
                     no.esquerda.direita
                 ):
                     no = self.rotacao_direita(no)
@@ -120,7 +132,7 @@ class AVL:
             no = no.esquerda if no.esquerda is not None else no.direita
             achou = True
         if no is not None:
-            no.altura = max(self.altura(no.esquerda), self.altura(no.direita)) + 1
+            no.altura = max(self._altura(no.esquerda), self._altura(no.direita)) + 1
         return (no, achou)
 
     def _minimo(self, no: Node) -> Node:
@@ -245,8 +257,6 @@ class AVL:
             + self._to_str(no.direita, reverse)
         )
 
-    def to_list(self, reverse=False):
-        return self._to_list(self.raiz, reverse)
 
     def _to_list(self, no: Node, reverse=False) -> Generator[Node, None, None]:
         if no is None:
@@ -260,5 +270,7 @@ class AVL:
             yield no
             yield from self._to_list(no.direita, reverse)
 
-    def first(self) -> Node | None:
-        return self.raiz
+    def _altura(self, no: Node):
+        if no is None:
+            return -1
+        return no.altura
