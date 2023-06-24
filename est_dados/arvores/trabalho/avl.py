@@ -4,14 +4,18 @@ from utils import remove_acentuacao, remove_pontuacao
 
 
 class Node:
-    valor: str = None
-    quantidade: int = 1
-    esquerda: "Node" = None
-    direita: "Node" = None
-    altura = 0
+    valor: str
+    quantidade: int
+    esquerda: "Node"
+    direita: "Node"
+    altura: int
 
     def __init__(self, valor):
         self.valor = valor
+        self.quantidade = 1
+        self.esquerda = None
+        self.direita = None
+        self.altura = 0
 
     def __str__(self):
         return self.valor
