@@ -4,6 +4,20 @@ from utils import remove_acentuacao, remove_pontuacao
 
 
 class Node:
+    """
+    Representa um nó em uma árvore AVL.
+
+    Atributos:
+        valor (str): O valor armazenado no nó.
+        quantidade (int): A quantidade de ocorrências do valor no nó.
+        esquerda (Node): Referência para o nó filho da esquerda.
+        direita (Node): Referência para o nó filho da direita.
+        altura (int): A altura do nó na árvore.
+
+    Métodos:
+        __init__(valor: str): Inicializa um novo objeto Node.
+        __str__(): Retorna uma representação em string do valor do nó.
+    """
     valor: str
     quantidade: int
     esquerda: "Node"
@@ -11,6 +25,12 @@ class Node:
     altura: int
 
     def __init__(self, valor):
+        """
+        Inicializa um novo objeto Node.
+
+        Args:
+            valor (str): O valor a ser armazenado no nó.
+        """
         self.valor = valor
         self.quantidade = 1
         self.esquerda = None
@@ -18,10 +38,47 @@ class Node:
         self.altura = 0
 
     def __str__(self):
+        """
+        Retorna uma representação em string do valor do nó.
+
+        Returns:
+            str: A representação em string do valor do nó.
+        """
         return self.valor
 
 
 class AVL:
+    """
+    Representa uma árvore AVL.
+
+    Atributos:
+        raiz (Node): Referência para o nó raiz da árvore.
+
+    Métodos:
+        __init__(): Inicializa um novo objeto AVL.
+        __str__(): Retorna uma representação em string da árvore.
+        __repr__(): Retorna uma representação em string da árvore.
+        __len__(): Retorna o número de nós na árvore.
+        __iter__(): Retorna um iterador para os nós da árvore.
+        __contains__(valor: str): Verifica se um valor está na árvore.
+        __getitem__(valor: str): Retorna um nó com o valor especificado.
+        __setitem__(valor: str, quantidade: int): Insere um valor na árvore.
+        __delitem__(valor: str): Remove um valor da árvore.
+        _inserir(no: Node, valor: str): Insere um valor na árvore.
+        _remover(no: Node, valor: str): Remove um valor da árvore.
+        _buscar(no: Node, valor: str): Retorna um nó com o valor especificado.
+        _atualizar_altura(no: Node): Atualiza a altura de um nó.
+        _rotacao_esquerda(no: Node): Realiza uma rotação simples para a esquerda.
+        _rotacao_direita(no: Node): Realiza uma rotação simples para a direita.
+        _rotacao_dupla_esquerda(no: Node): Realiza uma rotação dupla para a esquerda.
+        _rotacao_dupla_direita(no: Node): Realiza uma rotação dupla para a direita.
+        _balancear(no: Node): Balanceia um nó.
+        _pega_node_com_maior_quantidade(no: Node): Retorna o nó com a maior quantidade.
+        _pega_node_com_menor_quantidade(no: Node): Retorna o nó com a menor quantidade.
+        _pega_node_com_maior_valor(no: Node): Retorna o nó com o maior valor.
+        _pega_node_com_menor_valor(no: Node): Retorna o nó com o menor valor.
+
+    """
     raiz: Node = None
 
     def __str__(self):
@@ -276,7 +333,7 @@ class AVL:
         if no is not None:
             yield from self._pega_todos_com_uma_quantidade(no.esquerda)
             if no.quantidade == 1:
-                yield no.valor
+                yield no
             yield from self._pega_todos_com_uma_quantidade(no.direita)
 
     def pega_todos_entre_dois_valores(self, valor_minimo, valor_maximo):
