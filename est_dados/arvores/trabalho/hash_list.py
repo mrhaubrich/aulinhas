@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-
-# the hash key is the first letter of the word
-# the value is the word
-# the hash table is a list of linked lists
-
-import sys
-
 from avl import AVL, Node
 from hash_node import HashNode
 from utils import remove_acentuacao, remove_pontuacao

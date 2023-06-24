@@ -11,7 +11,15 @@ console = Console()
 
 
 class Tui:
-    def get_main_menu(self):
+    def __init__(self):
+        self.hash_list = HashList()
+
+    def __getitem__(self, value: str):
+        return self.hash_list[value]
+
+    # region Relacionado à interface
+    @property
+    def main_menu(self):
         return {
             "1": {
                 "text": "Inserir palavra",
@@ -56,14 +64,19 @@ class Tui:
             "11": {
                 "text": "Printar a estrutura das árvores",
                 "function": self.print_estrutura,
-            }
+            },
         }
 
-    def __init__(self):
-        self.hash_list = HashList()
+    def press_any_key(self):
+        console.input("Pressione qualquer tecla para continuar...")
 
-    def __getitem__(self, value: str):
-        return self.hash_list[value]
+    def print_main_menu(self):
+        console.clear()
+        console.print("Menu principal", style="bold")
+        for key, value in self.main_menu.items():
+            console.print(f"{key}. {value['text']}")
+
+    # endregion
 
     def main(self):
         while True:
@@ -72,21 +85,15 @@ class Tui:
             if option == "0":
                 break
             try:
-                self.get_main_menu()[option]["function"]()
+                self.main_menu[option]["function"]()
             except KeyError:
                 console.print("Opção inválida", style="bold red")
                 self.press_any_key()
 
-    def print_main_menu(self):
-        console.clear()
-        console.print("Menu principal", style="bold")
-        for key, value in self.get_main_menu().items():
-            console.print(f"{key}. {value['text']}")
-
     def inserir(self):
         word = console.input("Digite a palavra: ")
         self.hash_list.inserir(word)
-        print("Palavra inserida com sucesso")
+        console.print("Palavra inserida com sucesso", style="bold green")
 
     def buscar(self):
         word = input("Digite a palavra: ")
@@ -132,7 +139,6 @@ class Tui:
             console.print("Palavra não encontrada", style="bold red")
         self.press_any_key()
 
-
     def print_by_letter(self):
         letter = input("Digite a letra: ")
         order = input("1 - Ordem A-Z\n2 - Ordem Z-A\n")
@@ -159,7 +165,7 @@ class Tui:
             console.print("Opção inválida", style="bold red")
         else:
             retorno = self.hash_list.to_list(reverse=order == "2")
-            table = Table(title=f"Palavras")
+            table = Table(title="Palavras")
             table.add_column("Palavra")
             table.add_column("Ocorrências")
             for i in retorno:
@@ -178,10 +184,6 @@ class Tui:
         console.print(table)
         self.press_any_key()
 
-    def print_by_occur(self):
-        occur = int(input("Digite a quantidade de ocorrências: "))
-        self.hash_list.print_by_occur(occur)
-
     def print_one_occur(self):
         words = self.hash_list.get_one_occur()
         table = Table(title="Palavras com uma única ocorrência")
@@ -198,9 +200,6 @@ class Tui:
         if file_name == "":
             file_name = "texto.txt"
         self.hash_list.read_file(file_name)
-
-    def press_any_key(self):
-        console.input("Pressione qualquer tecla para continuar...")
 
     def print_estrutura(self):
         console.clear()

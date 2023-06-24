@@ -219,15 +219,13 @@ class AVL:
     def pega_todos_com_uma_quantidade(self):
         return self._pega_todos_com_uma_quantidade(self.raiz)
 
-    def _pega_todos_com_uma_quantidade(self, no: Node) -> list[Node]:
+    def _pega_todos_com_uma_quantidade(self, no: Node) -> Generator[Node, None, None]:
         if no is None:
-            return []
-        lista = []
+            return
+        yield from self._pega_todos_com_uma_quantidade(no.esquerda)
         if no.quantidade == 1:
-            lista.append(no)
-        lista += self._pega_todos_com_uma_quantidade(no.esquerda)
-        lista += self._pega_todos_com_uma_quantidade(no.direita)
-        return lista
+            yield no
+        yield from self._pega_todos_com_uma_quantidade(no.direita)
 
     def to_str(self, reverse=False):
         return self._to_str(self.raiz, reverse)
@@ -264,25 +262,3 @@ class AVL:
 
     def first(self) -> Node | None:
         return self.raiz
-
-
-if __name__ == "__main__":
-    arvore = AVL()
-
-    for i in range(15):
-        arvore.inserir(i)
-
-    print("depois de inserir")
-    arvore.print()
-
-    for i in range(10):
-        del arvore[i]
-
-    print("depois de deletar")
-    arvore.print()
-
-    for i in range(15):
-        arvore.inserir(i)
-
-    print("depois de inserir novamente")
-    arvore.print()

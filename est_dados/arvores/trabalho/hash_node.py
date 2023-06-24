@@ -29,17 +29,17 @@ class HashNode:
 
     def remover(self, value: str):
         return self.value.remover(value)
-    
+
     def __len__(self):
         if self.value is None:
             return 0
         return len(self.value)
-    
-    def to_str(self, reverse = False):
+
+    def to_str(self, reverse=False):
         return self.value.to_str(reverse)
-    
+
     def to_list(self, reverse=False):
         return self.value.to_list(reverse)
-    
+
     def first(self):
         return self.value.first()
