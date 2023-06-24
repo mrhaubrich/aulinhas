@@ -17,6 +17,9 @@ class Node:
         return self.valor
 
 
+def _tratar_str(valor: str):
+    return remove_acentuacao(remove_pontuacao(valor.lower()))
+
 class AVL:
     raiz: Node = None
 
@@ -64,8 +67,8 @@ class AVL:
         if no is None:
             return Node(valor)
 
-        valor_atual = remove_acentuacao(remove_pontuacao(no.valor.lower()))
-        valor_novo = remove_acentuacao(remove_pontuacao(valor.lower()))
+        valor_atual = _tratar_str(no.valor)
+        valor_novo = _tratar_str(valor)
 
         if valor_novo < valor_atual:
             no.esquerda = self._inserir(valor, no.esquerda)
@@ -86,13 +89,13 @@ class AVL:
         fator_balanceamento = self.fator_balanceamento(no)
 
         if fator_balanceamento == -2:
-            valor_filho_esquerda = remove_acentuacao(remove_pontuacao(no.esquerda.valor.lower()))
+            valor_filho_esquerda = _tratar_str(no.esquerda.valor)
             if valor_novo < valor_filho_esquerda:
                 no = self.rotacao_direita(no)
             else:
                 no = self.rotacao_dupla_direita(no)
         elif fator_balanceamento == 2:
-            valor_filho_direita = remove_acentuacao(remove_pontuacao(no.direita.valor.lower()))
+            valor_filho_direita = _tratar_str(no.direita.valor)
             if valor_novo > valor_filho_direita:
                 no = self.rotacao_esquerda(no)
             else:
@@ -106,34 +109,27 @@ class AVL:
         return achou
 
     def _remover(self, valor, no: Node) -> Tuple[Node | None, bool]:
-        achou = False
         if no is None:
-            return (None, achou)
-        if valor < no.valor:
+            return (None, False)
+        
+        if _tratar_str(valor) < _tratar_str(no.valor):
             (no.esquerda, achou) = self._remover(valor, no.esquerda)
-            if self.fator_balanceamento(no) == 2:
-                if self._altura(no.direita.direita) >= self._altura(no.direita.esquerda):
-                    no = self.rotacao_esquerda(no)
-                else:
-                    no = self.rotacao_dupla_esquerda(no)
-        elif valor > no.valor:
+        elif _tratar_str(valor) > _tratar_str(no.valor):
             (no.direita, achou) = self._remover(valor, no.direita)
-            if self.fator_balanceamento(no) == -2:
-                if self._altura(no.esquerda.esquerda) >= self._altura(
-                    no.esquerda.direita
-                ):
-                    no = self.rotacao_direita(no)
-                else:
-                    no = self.rotacao_dupla_direita(no)
-        elif no.esquerda is not None and no.direita is not None:
-            no.valor = self._minimo(no.direita).valor
-            (no.direita, achou) = self._remover(no.valor, no.direita)
         else:
-            no = no.esquerda if no.esquerda is not None else no.direita
-            achou = True
+            if no.esquerda is not None and no.direita is not None:
+                no.valor = self._minimo(no.direita).valor
+                (no.direita, achou) = self._remover(no.valor, no.direita)
+            else:
+                no = no.esquerda if no.esquerda is not None else no.direita
+                achou = True
+
         if no is not None:
             no.altura = max(self._altura(no.esquerda), self._altura(no.direita)) + 1
+            no = self._balancear(no, valor, no.valor)
+
         return (no, achou)
+
 
     def _minimo(self, no: Node) -> Node:
         """Retorna o nó com o menor valor da subárvore."""
@@ -152,10 +148,10 @@ class AVL:
     def _buscar(self, valor, no: Node):
         if no is None:
             return None
-
-        if valor < no.valor:
+        
+        if _tratar_str(valor) < _tratar_str(no.valor):
             return self._buscar(valor, no.esquerda)
-        if valor > no.valor:
+        if _tratar_str(valor) > _tratar_str(no.valor):
             return self._buscar(valor, no.direita)
         return no
 
