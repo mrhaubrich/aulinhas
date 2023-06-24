@@ -58,6 +58,9 @@ class Tui:
     def __init__(self):
         self.hash_list = HashList()
 
+    def __getitem__(self, value: str):
+        return self.hash_list[value]
+
     def main(self):
         while True:
             self.print_main_menu()
@@ -113,12 +116,20 @@ class Tui:
 
     def count_word(self):
         word = input("Digite a palavra: ")
-        console.print(f"Quantidade de ocorrências: {self.hash_list.count_word(word)}")
+        table = Table(title="Quantidade de ocorrências")
+        table.add_column("Palavra")
+        table.add_column("Ocorrências")
+        word = self.hash_list[word]
+        console.clear()
+        if word is not None:
+            table.add_row(word.valor, str(word.quantidade))
+            console.print(table)
+        else:
+            console.print("Palavra não encontrada", style="bold red")
         self.press_any_key()
 
+
     def print_by_letter(self):
-        print(self._list)
-        print(self._list[0])
         letter = input("Digite a letra: ")
         order = input("1 - Ordem A-Z\n2 - Ordem Z-A\n")
         if order == "1":

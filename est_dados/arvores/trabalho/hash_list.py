@@ -65,6 +65,9 @@ class HashList:
             if i is not None:
                 s += str(i)
         return s
+    
+    def __getitem__(self, value: str) -> Node | None:
+        return self._buscar(value)
 
     def read_file(self, filename: str):
         with open(filename, encoding="utf-8") as f:
@@ -80,7 +83,7 @@ class HashList:
                     one_occur.extend(node)
         return one_occur
 
-    def buscar(self, value: str):
+    def _buscar(self, value: str):
         index = _hash_function(value)
         if self._list[index] is None:
             return None
