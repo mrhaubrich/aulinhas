@@ -1,4 +1,6 @@
-from typing import Tuple
+from typing import Generator, Tuple
+
+from utils import remove_acentuacao, remove_pontuacao
 
 
 class Node:
@@ -78,20 +80,28 @@ class AVL:
     def inserir(self, valor):
         self.raiz = self._inserir(valor, self.raiz)
 
-    def _inserir(self, valor, no: Node):
+    def _inserir(self, valor: str, no: Node):
         if no is None:
             return Node(valor)
-        if valor < no.valor:
+        if remove_acentuacao(remove_pontuacao(valor.lower())) < remove_acentuacao(
+            remove_pontuacao(no.valor.lower())
+        ):
             no.esquerda = self._inserir(valor, no.esquerda)
             if self.altura(no.esquerda) - self.altura(no.direita) == 2:
-                if valor < no.esquerda.valor:
+                if remove_acentuacao(
+                    remove_pontuacao(valor.lower())
+                ) < remove_acentuacao(remove_pontuacao(no.esquerda.valor.lower())):
                     no = self.rotacao_direita(no)
                 else:
                     no = self.rotacao_dupla_direita(no)
-        elif valor > no.valor:
+        elif remove_acentuacao(remove_pontuacao(valor.lower())) > remove_acentuacao(
+            remove_pontuacao(no.valor.lower())
+        ):
             no.direita = self._inserir(valor, no.direita)
             if self.altura(no.direita) - self.altura(no.esquerda) == 2:
-                if valor > no.direita.valor:
+                if remove_acentuacao(
+                    remove_pontuacao(valor.lower())
+                ) > remove_acentuacao(remove_pontuacao(no.direita.valor.lower())):
                     no = self.rotacao_esquerda(no)
                 else:
                     no = self.rotacao_dupla_esquerda(no)
@@ -152,6 +162,7 @@ class AVL:
     def _buscar(self, valor, no: Node):
         if no is None:
             return None
+
         if valor < no.valor:
             return self._buscar(valor, no.esquerda)
         if valor > no.valor:
@@ -208,9 +219,6 @@ class AVL:
             return s
         return ""
 
-    def print(self):
-        print(self)
-
     def pega_node_com_maior_quantidade(self):
         return self._pega_node_com_maior_quantidade(self.raiz)
 
@@ -242,6 +250,42 @@ class AVL:
         lista += self._pega_todos_com_uma_quantidade(no.esquerda)
         lista += self._pega_todos_com_uma_quantidade(no.direita)
         return lista
+
+    def to_str(self, reverse=False):
+        return self._to_str(self.raiz, reverse)
+
+    def _to_str(self, no: Node, reverse=False):
+        if no is None:
+            return ""
+        if reverse:
+            return (
+                self._to_str(no.direita, reverse)
+                + f" {str(no)} "
+                + self._to_str(no.esquerda, reverse)
+            )
+        return (
+            self._to_str(no.esquerda, reverse)
+            + f" {str(no)} "
+            + self._to_str(no.direita, reverse)
+        )
+
+    def to_list(self, reverse=False):
+        return self._to_list(self.raiz, reverse)
+
+    def _to_list(self, no: Node, reverse=False) -> Generator[Node, None, None]:
+        if no is None:
+            return
+        if reverse:
+            yield from self._to_list(no.direita, reverse)
+            yield no
+            yield from self._to_list(no.esquerda, reverse)
+        else:
+            yield from self._to_list(no.esquerda, reverse)
+            yield no
+            yield from self._to_list(no.direita, reverse)
+
+    def first(self) -> Node | None:
+        return self.raiz
 
 
 if __name__ == "__main__":

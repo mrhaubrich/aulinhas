@@ -86,7 +86,7 @@ class Tui:
 
     def buscar(self):
         word = input("Digite a palavra: ")
-        palavra = self.hash_list.buscar(word)
+        palavra = self.hash_list[word]
         table = None
         console.clear()
         if palavra is not None:
@@ -132,13 +132,19 @@ class Tui:
     def print_by_letter(self):
         letter = input("Digite a letra: ")
         order = input("1 - Ordem A-Z\n2 - Ordem Z-A\n")
-        if order == "1":
-            self.hash_list.print_with_letter(letter, False)
-        elif order == "2": 
-            self.hash_list.print_with_letter(letter, True)
-        else:
+
+        console.clear()
+        if order not in ("1", "2"):
             console.print("Opção inválida", style="bold red")
-        
+        else:
+            retorno = self.hash_list.to_list_with_letter(letter, reverse=order == "2")
+            table = Table(title=f"Palavras com a letra {letter}")
+            table.add_column("Palavra")
+            table.add_column("Ocorrências")
+            for i in retorno:
+                table.add_row(i.valor, str(i.quantidade))
+            console.print(table)
+
         self.press_any_key()
 
     def print_all_words(self):

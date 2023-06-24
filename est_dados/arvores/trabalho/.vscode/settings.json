@@ -8,5 +8,9 @@
     "python.linting.ignorePatterns": [
         "**/site-packages/**/*.py",
         ".vscode/*.py",
-    ]
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.formatting.provider": "none"
 }

@@ -12,6 +12,7 @@ from rich import console as _console, pretty
 
 from avl import AVL, Node
 from hash_node import HashNode
+from utils import remove_acentuacao, remove_pontuacao
 
 pretty.install()
 
@@ -32,22 +33,31 @@ class HashList:
             self._list[index] = HashNode(AVL())
         self._list[index].inserir(value)
 
-    def print(self, reverse = False):
+    def print(self, reverse=False):
         lista = reversed(self._list) if reverse else self._list
         for i in lista:
             if i is not None:
                 i.print()
-            # else:
-            #     print('|   None')
 
-    def print_with_letter(self, letter, reverse = False):
+    def print_with_letter(self, letter, reverse=False):
         lista = reversed(self._list) if reverse else self._list
         for i in lista:
             if i is not None:
-                if i.value[0] == letter:
+                if i.value[0].valor[0] == letter:
                     i.print()
-            # else:
-            #     print('|   None')
+
+    def to_list_with_letter(self, letter: str, reverse=False):
+        lista = reversed(self._list) if reverse else self._list
+        _lista: list[Node] = []
+
+        for i in lista:
+            if i is not None:
+                if remove_acentuacao(
+                    remove_pontuacao(i.value.first().valor[0].lower())
+                ) == remove_acentuacao(remove_pontuacao(letter.lower())):
+                    _lista.extend(i.to_list())
+
+        return _lista
 
     def get_most_occur(self):
         most_occur: Node | None = None
@@ -65,7 +75,7 @@ class HashList:
             if i is not None:
                 s += str(i)
         return s
-    
+
     def __getitem__(self, value: str) -> Node | None:
         return self._buscar(value)
 
@@ -94,30 +104,10 @@ class HashList:
         if self._list[index] is None:
             return False
         return self._list[index].remover(value)
-    
+
     def __len__(self):
         # if item is none return 0
         return sum(len(i) for i in self._list if i is not None)
-
-
-def remove_acentuacao(val: str) -> str:
-    regex = re.compile(r"[áàãâä]")
-    val = regex.sub("a", val)
-    regex = re.compile(r"[éèêë]")
-    val = regex.sub("e", val)
-    regex = re.compile(r"[íìîï]")
-    val = regex.sub("i", val)
-    regex = re.compile(r"[óòõôö]")
-    val = regex.sub("o", val)
-    regex = re.compile(r"[úùûü]")
-    val = regex.sub("u", val)
-    return val
-
-
-def remove_pontuacao(val: str) -> str:
-    regex = re.compile(r"[^\w\s]")
-    val = regex.sub("", val)
-    return val
 
 
 if __name__ == "__main__":
