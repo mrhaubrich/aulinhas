@@ -39,13 +39,6 @@ class HashList:
             if i is not None:
                 i.print()
 
-    def print_with_letter(self, letter, reverse=False):
-        lista = reversed(self._list) if reverse else self._list
-        for i in lista:
-            if i is not None:
-                if i.value[0].valor[0] == letter:
-                    i.print()
-
     def to_list_with_letter(self, letter: str, reverse=False):
         lista = reversed(self._list) if reverse else self._list
         _lista: list[Node] = []
@@ -56,6 +49,16 @@ class HashList:
                     remove_pontuacao(i.value.first().valor[0].lower())
                 ) == remove_acentuacao(remove_pontuacao(letter.lower())):
                     _lista.extend(i.to_list(reverse))
+
+        return _lista
+    
+    def to_list(self, reverse=False):
+        lista = reversed(self._list) if reverse else self._list
+        _lista: list[Node] = []
+
+        for i in lista:
+            if i is not None:
+                _lista.extend(i.to_list(reverse))
 
         return _lista
 

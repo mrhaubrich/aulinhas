@@ -153,13 +153,19 @@ class Tui:
 
     def print_all_words(self):
         order = input("1 - Ordem A-Z\n2 - Ordem Z-A\n")
-        if order == "1":
-            self.hash_list.print(False)
-        elif order == "2": 
-            self.hash_list.print(True)
-        else:
+
+        console.clear()
+        if order not in ("1", "2"):
             console.print("Opção inválida", style="bold red")
-        
+        else:
+            retorno = self.hash_list.to_list(reverse=order == "2")
+            table = Table(title=f"Palavras")
+            table.add_column("Palavra")
+            table.add_column("Ocorrências")
+            for i in retorno:
+                table.add_row(i.valor, str(i.quantidade))
+            console.print(table)
+
         self.press_any_key()
 
     def print_most_occur(self):
