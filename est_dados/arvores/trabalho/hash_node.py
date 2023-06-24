@@ -39,7 +39,11 @@ class HashNode:
         return self.value.to_str(reverse)
 
     def to_list(self, reverse=False):
-        return self.value.to_list(reverse)
+        lista = list(iter(self.value))
+        if reverse:
+            lista.reverse()
+        return lista
+
 
     def first(self):
         return self.value.first()

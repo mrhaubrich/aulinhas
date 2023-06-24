@@ -24,14 +24,12 @@ class Node:
 def _tratar_str(valor: str):
     return remove_acentuacao(remove_pontuacao(valor.lower()))
 
+
 class AVL:
     raiz: Node = None
 
     def first(self) -> Node | None:
         return self.raiz
-    
-    def to_list(self, reverse=False):
-        return self._to_list(self.raiz, reverse)
 
     def fator_balanceamento(self, no: Node):
         return self._altura(no.direita) - self._altura(no.esquerda)
@@ -87,7 +85,6 @@ class AVL:
         no = self._balancear(no, valor_novo, valor_atual)
 
         return no
-    
 
     def _balancear(self, no: Node, valor_novo: str, valor_atual: str):
         fator_balanceamento = self.fator_balanceamento(no)
@@ -107,7 +104,6 @@ class AVL:
 
         return no
 
-
     def remover(self, valor):
         (self.raiz, achou) = self._remover(valor, self.raiz)
         return achou
@@ -115,7 +111,7 @@ class AVL:
     def _remover(self, valor, no: Node) -> Tuple[Node | None, bool]:
         if no is None:
             return (None, False)
-        
+
         if _tratar_str(valor) < _tratar_str(no.valor):
             (no.esquerda, achou) = self._remover(valor, no.esquerda)
         elif _tratar_str(valor) > _tratar_str(no.valor):
@@ -134,7 +130,6 @@ class AVL:
 
         return (no, achou)
 
-
     def _minimo(self, no: Node) -> Node:
         """Retorna o nó com o menor valor da subárvore."""
         while no.esquerda is not None:
@@ -152,7 +147,7 @@ class AVL:
     def _buscar(self, valor, no: Node):
         if no is None:
             return None
-        
+
         if _tratar_str(valor) < _tratar_str(no.valor):
             return self._buscar(valor, no.esquerda)
         if _tratar_str(valor) > _tratar_str(no.valor):
@@ -176,7 +171,7 @@ class AVL:
     def _iter(self, no: Node):
         if no is not None:
             yield from self._iter(no.esquerda)
-            yield no.valor
+            yield no
             yield from self._iter(no.direita)
 
     def __repr__(self):
@@ -241,34 +236,6 @@ class AVL:
 
     def to_str(self, reverse=False):
         return self._to_str(self.raiz, reverse)
-
-    def _to_str(self, no: Node, reverse=False):
-        if no is None:
-            return ""
-        if reverse:
-            return (
-                self._to_str(no.direita, reverse)
-                + f" {str(no)} "
-                + self._to_str(no.esquerda, reverse)
-            )
-        return (
-            self._to_str(no.esquerda, reverse)
-            + f" {str(no)} "
-            + self._to_str(no.direita, reverse)
-        )
-
-
-    def _to_list(self, no: Node, reverse=False) -> Generator[Node, None, None]:
-        if no is None:
-            return
-        if reverse:
-            yield from self._to_list(no.direita, reverse)
-            yield no
-            yield from self._to_list(no.esquerda, reverse)
-        else:
-            yield from self._to_list(no.esquerda, reverse)
-            yield no
-            yield from self._to_list(no.direita, reverse)
 
     def _altura(self, no: Node):
         if no is None:
