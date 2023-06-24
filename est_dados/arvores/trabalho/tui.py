@@ -53,6 +53,10 @@ class Tui:
                 "text": "Exibe a lista das palavras da estrutura",
                 "function": self.print_all_words,
             },
+            "11": {
+                "text": "Printar a estrutura das árvores",
+                "function": self.print_estrutura,
+            }
         }
 
     def __init__(self):
@@ -191,6 +195,11 @@ class Tui:
 
     def press_any_key(self):
         console.input("Pressione qualquer tecla para continuar...")
+
+    def print_estrutura(self):
+        console.clear()
+        console.print(self.hash_list)
+        self.press_any_key()
 
 
 if __name__ == "__main__":
