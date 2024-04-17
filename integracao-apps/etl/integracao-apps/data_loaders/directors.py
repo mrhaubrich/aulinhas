@@ -16,9 +16,9 @@ def load_data_from_file(*args, **kwargs):
 
     Docs: https://docs.mage.ai/design/data-loading#fileio
     """
-    filepath = 'integracao-apps/assets/movies.csv'
+    filepath = 'integracao-apps/assets/directors.csv'
 
-    return FileIO().load(filepath, delimiter=';')
+    return FileIO().load(filepath)
 
 
 @test
