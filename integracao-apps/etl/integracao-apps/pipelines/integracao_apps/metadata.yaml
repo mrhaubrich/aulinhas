@@ -69,7 +69,8 @@ blocks:
 - all_upstream_blocks_executed: true
   color: null
   configuration: {}
-  downstream_blocks: []
+  downstream_blocks:
+  - export_json
   executor_config: null
   executor_type: local_python
   has_callback: false
@@ -82,6 +83,22 @@ blocks:
   upstream_blocks:
   - column_drop
   uuid: sort
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: export json
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - sort
+  uuid: export_json
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config: {}
